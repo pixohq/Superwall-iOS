@@ -78,7 +78,7 @@ class ConfigManager {
       choosePaywallVariants(from: config.triggers)
       configState.send(.retrieved(config))
 
-      Task { await preloadPaywalls() }
+      await preloadPaywalls()
     } catch {
       configState.send(completion: .failure(error))
       Logger.debug(
@@ -136,9 +136,7 @@ class ConfigManager {
         )
       }
 
-      if Superwall.shared.options.paywalls.shouldPreload {
-        Task { await preloadAllPaywalls() }
-      }
+      await preloadAllPaywalls()
     } catch {
       Logger.debug(
         logLevel: .error,
@@ -204,9 +202,9 @@ class ConfigManager {
   ///
   /// A developer can disable preloading of paywalls by setting ``SuperwallOptions/shouldPreloadPaywalls``.
   private func preloadPaywalls() async {
-    guard Superwall.shared.options.paywalls.shouldPreload else {
-      return
-    }
+//    guard Superwall.shared.options.paywalls.shouldPreload else {
+//      return
+//    }
     await preloadAllPaywalls()
   }
 

@@ -14,9 +14,9 @@ class PaywallManager {
 	}
   private let queue = DispatchQueue(label: "com.superwall.paywallmanager")
   private unowned let paywallRequestManager: PaywallRequestManager
-  private unowned let factory: ViewControllerFactory & CacheFactory & DeviceHelperFactory
+  unowned let factory: ViewControllerFactory & CacheFactory & DeviceHelperFactory
 
-  private var cache: PaywallViewControllerCache {
+  var cache: PaywallViewControllerCache {
     return queue.sync { _cache ?? createCache() }
   }
   private var _cache: PaywallViewControllerCache?
@@ -63,11 +63,7 @@ class PaywallManager {
   ) async throws -> PaywallViewController {
     let paywall = try await paywallRequestManager.getPaywall(from: request)
 
-    let deviceInfo = factory.makeDeviceInfo()
-    let cacheKey = PaywallCacheLogic.key(
-      identifier: paywall.identifier,
-      locale: deviceInfo.locale
-    )
+    let cacheKey = cacheKey(for: paywall)
 
     if !request.isDebuggerLaunched,
       let viewController = self.cache.getPaywallViewController(forKey: cacheKey) {
@@ -92,5 +88,15 @@ class PaywallManager {
     }
 
     return paywallViewController
+  }
+
+  func cacheKey(for paywall: Paywall) -> String {
+    let deviceInfo = factory.makeDeviceInfo()
+    let cacheKey = PaywallCacheLogic.key(
+      identifier: paywall.identifier,
+      locale: deviceInfo.locale
+    )
+
+    return cacheKey
   }
 }

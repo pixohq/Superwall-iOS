@@ -208,6 +208,28 @@ public final class Superwall: NSObject, ObservableObject {
       _ = await (fetchConfig, configureIdentity)
 
       await MainActor.run {
+        if
+          let paywalls = dependencyContainer.configManager.config?.paywalls,
+          let paywallManager = dependencyContainer.paywallManager
+        {
+          for paywall in paywalls {
+            let cacheKey = paywallManager.cacheKey(for: paywall)
+
+            guard paywallManager.cache.getPaywallViewController(forKey: cacheKey) == nil else {
+              continue
+            }
+
+            let paywallViewController = paywallManager.factory.makePaywallViewController(
+              for: paywall,
+              withCache: paywallManager.cache,
+              delegate: nil
+            )
+
+            paywallViewController.loadViewIfNeeded()
+            paywallManager.cache.save(paywallViewController, forKey: cacheKey)
+          }
+        }
+
         completion?()
       }
     }
