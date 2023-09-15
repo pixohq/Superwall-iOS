@@ -49,7 +49,7 @@ public final class PaywallOptions: NSObject {
   ///
   /// If you want to preload them at a later date, you can call ``Superwall/preloadAllPaywalls()``
   /// or ``Superwall/preloadPaywalls(forEvents:)``
-  public var shouldPreload = true
+//  public var shouldPreload = true
 
   /// Automatically dismisses the paywall when a product is purchased or restored. Defaults to `true`.
   ///

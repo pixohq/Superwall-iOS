@@ -302,10 +302,14 @@ struct Paywall: Decodable {
   }
 }
 
-// MARK: - Equatable
-extension Paywall: Equatable {
+// MARK: - Hashable
+extension Paywall: Hashable {
   static func == (lhs: Paywall, rhs: Paywall) -> Bool {
     return lhs.databaseId == rhs.databaseId
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(databaseId)
   }
 }
 

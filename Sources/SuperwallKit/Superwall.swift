@@ -210,6 +210,16 @@ public final class Superwall: NSObject, ObservableObject {
       await MainActor.run {
         completion?()
       }
+
+      if let paywalls = dependencyContainer.configManager.config?.paywalls {
+        for paywall in paywalls {
+          guard paywall.onDeviceCache == .enabled else {
+            continue
+          }
+
+          try? await PaywallWebArchiveDataManager.shared.saveWebArchive(paywall: paywall)
+        }
+      }
     }
   }
 

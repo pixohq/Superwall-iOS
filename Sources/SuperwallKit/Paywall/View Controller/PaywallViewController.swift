@@ -10,6 +10,7 @@ import WebKit
 import UIKit
 import SafariServices
 import Combine
+import UniformTypeIdentifiers
 
 @objc(SWKPaywallViewController)
 public class PaywallViewController: UIViewController, LoadingDelegate {
@@ -279,8 +280,19 @@ public class PaywallViewController: UIViewController, LoadingDelegate {
     }
 
     if paywall.onDeviceCache == .enabled {
-      let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
-      webView.load(request)
+      Task {
+        if let webArchiveData = try? await PaywallWebArchiveDataManager.shared.webArchive(paywall: paywall) {
+          webView.load(
+            webArchiveData,
+            mimeType: UTType.webArchive.preferredMIMEType ?? "application/x-webarchive",
+            characterEncodingName: "UTF-8",
+            baseURL: paywall.url
+          )
+        } else {
+          let request = URLRequest(url: url)
+          webView.load(request)
+        }
+      }
     } else {
       let request = URLRequest(url: url)
       webView.load(request)
